@@ -1,0 +1,86 @@
+@(slug: String, username: String)(implicit request: RequestHeader)
+
+@main(Some(username)) {
+
+    <header>
+        <h1>the @slug mob</h1>
+        <div class="meta">
+            <span class="you">You are @username</span>
+            <span class="size">14287 people</span>
+        </div>
+    </header>
+
+    <div class="js-on-error alert-message error">
+        <p>
+            <strong>Oops!</strong> <span></span>
+        </p>
+    </div>
+
+    <div class="js-on-chat discourse">
+        <div class="chat-stage">
+            <div class="messages"></div>
+            <textarea class="speak"></textarea>
+        </div>
+        <ul class="members">
+        </ul>
+    </div>
+
+    <script type="text/javascript" charset="utf-8">
+
+        $(function() {
+
+			var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+            var chatSocket = new WS("@routes.Application.mobChat(slug, username).webSocketURL()")
+
+            var sendMessage = function() {
+                chatSocket.send(JSON.stringify(
+                    {text: $(".speak").val()}
+                ))
+                $(".speak").val('')
+            }
+
+            var receiveEvent = function(event) {
+                var data = JSON.parse(event.data)
+
+                // Handle errors
+                if(data.error) {
+                    chatSocket.close()
+                    $(".js-on-error span").text(data.error)
+                    $(".js-on-error").show()
+                    return
+                } else {
+                    $(".js-on-chat, .discourse, .meta").show()
+                }
+
+                // Create the message element
+                var el = $('<div class="message"><span class="username"></span><p></p></div>')
+                $("span", el).text(data.user)
+                $("p", el).text(data.message)
+                $(el).addClass(data.kind)
+                if(data.user == '@username') $(el).addClass('me')
+                $('.messages').append(el)
+
+                // Update the members list
+                $(".members").empty()
+                $(data.members).each(function() {
+                    $(".members").append('<li>' + this + '</li>')
+                })
+                $(".size").html(data.members.length.toString() + ' people')
+            }
+
+            var handleReturnKey = function(e) {
+                if(e.charCode == 13 || e.keyCode == 13) {
+                    e.preventDefault()
+                    sendMessage()
+                }
+            }
+
+            $(".speak").keypress(handleReturnKey)
+
+            chatSocket.onmessage = receiveEvent
+
+        })
+
+    </script>
+
+}

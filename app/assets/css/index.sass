@@ -1,0 +1,90 @@
+$primary-color: #8962EB
+$background-color: #fafafa
+$secondary-color: #00ce7d
+$error-color: #EA4E3C
+$warning-color: #E2E942
+$success-color: #22D689
+$primary-type: Verdana, Geneva, sans-serif
+$selection-background: #222
+
+@import "core/core"
+
+html
+    background: $background-color
+    color: #111
+
+.alert-message, .discourse, .meta
+    display: none
+.error
+    background: $error-color
+    color: #fff
+    padding: 1em
+
+$header-height: 6.4em
+header
+    color: $background-color
+    height: $header-height
+    h1
+        margin: 0
+        text-align: center
+        background: $primary-color
+        font-size: 1.2em
+        padding: 1em
+    .meta
+        background: darken($primary-color, 6%)
+        padding: 0.5em 1em
+        color: #4D2AA5
+    .size
+        float: right
+
+$speak-height: 4em
+.speak
+    width: 100%
+    height: $speak-height
+    max-height: $speak-height
+    padding: 0.5em 1em
+    position: absolute
+    bottom: 0
+    border: none
+    border-top: 1px solid $primary-color
+    resize: none
+
+.discourse
+    position: absolute
+    padding-top: $header-height
+    top: 0
+    height: 100%
+    width: 100%
+    overflow: hidden
+.chat-stage
+    width: 75%
+    float: left
+    border-right: 1px solid #eee
+.members
+    width: 25%
+    float: right
+    padding: 1em
+.chat-stage,
+.members
+    overflow-y: scroll
+    height: 100%
+    padding-bottom: $speak-height
+
+.message
+    padding: 0.5em 1em 0.4em 1em
+    margin-bottom: 1px
+    p
+        display: inline
+    .username
+        font-weight: bold
+        margin-right: 0.6em
+    &.me
+        background: #E5F3FF
+        color: #0B538F
+
+.message.join,
+    background: $success-color
+    color: #fff
+.message.quit
+    background: $error-color
+    color: #fff
