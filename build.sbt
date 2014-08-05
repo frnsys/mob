@@ -10,5 +10,7 @@ libraryDependencies ++= Seq(
   jdbc,
   anorm,
   cache,
-  ws
+  ws,
+  "org.apache.opennlp" % "opennlp-tools" % "1.5.3",
+  "com.typesafe.akka" %% "akka-testkit"  % "2.3.4" % "test"
 )

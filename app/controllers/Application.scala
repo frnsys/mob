@@ -7,9 +7,6 @@ import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._ 
 
-import scala.concurrent._
-import scala.util.{Success, Failure}
-
 object Application extends Controller {
 
   def index = Action { implicit request =>
