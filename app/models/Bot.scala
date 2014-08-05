@@ -24,6 +24,9 @@ import opennlp.tools.sentdetect._
 object Bot {
   final val RESPONSE_PROBABILITY = 0.05
   final val SPAWN_PROBABILITY = 0.9999
+  final val LURKER_PROBABILITY = 0.95
+  final val CHATTY_PROBABILITY = 0.001
+  final val REGULAR_PROBABILITY = 1 - LURKER_PROBABILITY - CHATTY_PROBABILITY
 
   private val corpus = scala.io.Source.fromFile("project/fodder.txt", "utf-8").getLines.mkString
   private val usernames = prepareUsernames(corpus)
@@ -147,8 +150,8 @@ class Bot(username: String, mob: ActorRef) extends Actor {
 object Personality {
   def apply =
     Random.nextFloat match {
-      case r if r < 0.75 => new Lurker
-      case r if r < 0.95 => new Regular
+      case r if r < Bot.LURKER_PROBABILITY => new Lurker
+      case r if r < Bot.REGULAR_PROBABILITY => new Regular
       case _ => new Chatty
     }
 }

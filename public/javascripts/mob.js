@@ -1,7 +1,9 @@
 $(function() {
     var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
     var chatSocket = new WS(WSRoute)
-    var userCount = 0;
+    var userCount = 0
+    var userColors = {}
+    var colorGenerator = new RColor
 
     var sendMessage = function() {
         chatSocket.send(JSON.stringify(
@@ -49,20 +51,24 @@ $(function() {
                 $('.members').append('<li data-username="' + data.user + '">' + data.user + '</li>')
             }
 
-            if (data.kind === "quit") {
+            else if (data.kind === "quit") {
                 userCount--
                 $(".size").html(userCount.toString() + ' people')
                 $('.members [data-username="' + data.user + '"]').remove()
             }
 
+            else if (data.kind === "talk") {
+                var userColor = userColors[data.user]
+                if (userColor === undefined) {
+                    userColor = colorGenerator.get(true)
+                    userColors[data.user] = userColor
+                }
+                $("span", el).css("color", userColor);
+            }
+
             // Scroll to bottom.
             $('.chat-stage').stop().animate({scrollTop: $('.messages').height() }, 10);
         }
-
-
-        // TO DO
-        // * Limit length of chat history (to save from insanely large DOMs)
-        // * Prevent snap to bottom if scrolled back a certain threshold
     }
 
     var handleReturnKey = function(e) {
