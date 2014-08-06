@@ -23,7 +23,7 @@ import opennlp.tools.sentdetect._
 
 object Bot {
   final val RESPONSE_PROBABILITY = 0.05
-  final val SPAWN_PROBABILITY = 0.9999
+  final val SPAWN_PROBABILITY = 0.99
   final val LURKER_PROBABILITY = 0.95
   final val CHATTY_PROBABILITY = 0.001
   final val REGULAR_PROBABILITY = 1 - LURKER_PROBABILITY - CHATTY_PROBABILITY

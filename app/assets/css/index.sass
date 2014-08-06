@@ -56,16 +56,19 @@ $speak-height: 4em
     height: 100%
     width: 100%
     overflow: hidden
+
 .chat-stage
     width: 75%
     float: left
     border-right: 1px solid #eee
     &::-webkit-scrollbar
         display: none
+
 .members
     width: 25%
     float: right
     padding: 1em
+
 .chat-stage,
 .members
     overflow-y: scroll
@@ -90,3 +93,11 @@ $speak-height: 4em
 .message.quit
     background: $error-color
     color: #fff
+
+@media only screen and (max-width: 480px)
+    .members
+        display: none
+    .chat-stage
+        width: 100%
+        float: none
+        border-right: none
