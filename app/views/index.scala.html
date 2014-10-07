@@ -13,12 +13,13 @@
 
     }
 
+    <div class="welcome">
+        <h1>Mob</h1>
 
-    <h1>Mob</h1>
-
-    @form(action = routes.Application.joinMob) {
-        @inputText(mobForm("name"))
-        @inputText(mobForm("username"))
-        <input type="submit" value="Join">
-    }
+        @form(action = routes.Application.joinMob) {
+            @inputText(mobForm("mob"), args = 'autofocus -> true, '_showConstraints -> false)
+            @inputText(mobForm("username"), '_showConstraints -> false)
+            <input type="submit" value="Join">
+        }
+    </div>
 }

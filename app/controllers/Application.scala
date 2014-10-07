@@ -10,13 +10,13 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.data._
 import play.api.data.Forms._
 
-case class MobData(name: String, username: String)
+case class MobData(mob: String, username: String)
 
 object Application extends Controller {
 
   val mobForm = Form(
     mapping(
-      "name" -> nonEmptyText,
+      "mob" -> nonEmptyText,
       "username" -> nonEmptyText
     )(MobData.apply)(MobData.unapply)
   )
@@ -32,7 +32,7 @@ object Application extends Controller {
         BadRequest(views.html.index(formWithErrors))
       },
       mobData => {
-        Redirect(routes.Application.mob(mobData.name, Option(mobData.username)))
+        Redirect(routes.Application.mob(mobData.mob, Option(mobData.username)))
       }
     )
   }
