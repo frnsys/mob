@@ -29,7 +29,7 @@ object Bot {
   final val REGULAR_PROBABILITY = 1 - LURKER_PROBABILITY - CHATTY_PROBABILITY
 
   private val corpus = scala.io.Source.fromFile(Play.getFile("data/fodder.txt"), "utf-8").getLines.mkString
-  private val usernames = prepareUsernames(corpus)
+  private val usernames = scala.io.Source.fromFile(Play.getFile("data/usernames.txt"), "utf-8").getLines.toSeq
   private val fodder = prepareFodder(corpus)
 
   // Create a bot for a mob.
@@ -60,11 +60,6 @@ object Bot {
     sentenceModelInput.close()
 
     sentenceDetector.sentDetect(corpus)
-  }
-
-  private def prepareUsernames(corpus: String) = {
-    val simpleTokenizer = SimpleTokenizer.INSTANCE
-    simpleTokenizer.tokenize(corpus)
   }
 
   def generateSpeech = {
