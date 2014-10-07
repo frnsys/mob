@@ -5,8 +5,8 @@
 # Home page
 GET     /                           controllers.Application.index
 POST    /                           controllers.Application.joinMob
-GET     /mobs/:slug/chat            controllers.Application.mobChat(slug, username)
-GET     /mobs/:slug                 controllers.Application.mob(slug, username: Option[String] ?= None)
+GET     /mob/:slug/chat            controllers.Application.mobChat(slug, username)
+GET     /mob/:slug                 controllers.Application.mob(slug, username: Option[String] ?= None)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
