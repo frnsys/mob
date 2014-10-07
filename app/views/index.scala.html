@@ -1,4 +1,6 @@
-@()(implicit flash: Flash)
+@import helper._
+
+@(mobForm:Form[MobData])(implicit flash: Flash)
 
 @main(None) {
     @flash.get("error").map { errorMessage =>
@@ -11,10 +13,12 @@
 
     }
 
-    <div class="alert-message block-message info">
-        <p>
-            <strong>Mob</strong>
-        </p>
-    </div>
 
+    <h1>Mob</h1>
+
+    @form(action = routes.Application.joinMob) {
+        @inputText(mobForm("name"))
+        @inputText(mobForm("username"))
+        <input type="submit" value="Join">
+    }
 }

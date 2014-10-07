@@ -4,6 +4,7 @@
 
 # Home page
 GET     /                           controllers.Application.index
+POST    /                           controllers.Application.joinMob
 GET     /mobs/:slug/chat            controllers.Application.mobChat(slug, username)
 GET     /mobs/:slug                 controllers.Application.mob(slug, username: Option[String] ?= None)
 
