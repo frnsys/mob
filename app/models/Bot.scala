@@ -28,7 +28,7 @@ object Bot {
   final val CHATTY_PROBABILITY = 0.001
   final val REGULAR_PROBABILITY = 1 - LURKER_PROBABILITY - CHATTY_PROBABILITY
 
-  private val corpus = scala.io.Source.fromFile("project/fodder.txt", "utf-8").getLines.mkString
+  private val corpus = scala.io.Source.fromFile(Play.getFile("data/fodder.txt"), "utf-8").getLines.mkString
   private val usernames = prepareUsernames(corpus)
   private val fodder = prepareFodder(corpus)
 
@@ -54,7 +54,7 @@ object Bot {
   }
 
   private def prepareFodder(corpus: String) = {
-    val sentenceModelInput = new FileInputStream("project/en-sent.bin")
+    val sentenceModelInput = new FileInputStream(Play.getFile("data/en-sent.bin"))
     val sentenceModel = new SentenceModel(sentenceModelInput)
     val sentenceDetector = new SentenceDetectorME(sentenceModel)
     sentenceModelInput.close()

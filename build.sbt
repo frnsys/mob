@@ -14,3 +14,7 @@ libraryDependencies ++= Seq(
   "org.apache.opennlp" % "opennlp-tools" % "1.5.3",
   "com.typesafe.akka" %% "akka-testkit"  % "2.3.4" % "test"
 )
+
+mappings in Universal ++=
+  (baseDirectory.value / "data" * "*" get) map
+    (x => x -> ("data/" + x.getName))
