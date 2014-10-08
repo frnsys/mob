@@ -13,7 +13,7 @@ import play.libs.Akka
 
 import scala.concurrent._
 import scala.concurrent.duration._
-import scala.util.{Success, Failure}
+import scala.util.{Success, Failure, Random}
 
 object Mob {
 
@@ -129,6 +129,12 @@ class Mob extends Actor {
       bots = bots - username
       self ! Quit(username)
     }
+
+    case RandomUser(username) => {
+      val members_ = members - username
+      val username_ = members_.keys.toSeq(Random.nextInt(members_.size))
+      sender ! RespondTo(username_)
+    }
   }
 
   def die = {
@@ -192,3 +198,5 @@ case class DeregisterBot(username: String)
 
 case class Connected(enumerator:Enumerator[JsValue])
 case class CannotConnect(msg: String)
+
+case class RandomUser(username: String)

@@ -16,8 +16,6 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.util.Random
 
-import java.io.FileInputStream
-
 import opennlp.tools.tokenize._
 import opennlp.tools.sentdetect._
 
@@ -28,9 +26,9 @@ object Bot {
   final val CHATTY_PROBABILITY = 0.001
   final val REGULAR_PROBABILITY = 1 - LURKER_PROBABILITY - CHATTY_PROBABILITY
 
-  private val corpus = scala.io.Source.fromFile(Play.getFile("data/fodder.txt"), "utf-8").getLines.mkString
   private val usernames = scala.io.Source.fromFile(Play.getFile("data/usernames.txt"), "utf-8").getLines.toSeq
-  private val fodder = prepareFodder(corpus)
+  private val chatFodder = scala.io.Source.fromFile(Play.getFile("data/chats.txt"), "utf-8").getLines.toSeq
+  private val mentionFodder = scala.io.Source.fromFile(Play.getFile("data/mentions.txt"), "utf-8").getLines.toSeq
 
   // Create a bot for a mob.
   def apply(mob: ActorRef) {
@@ -53,17 +51,22 @@ object Bot {
     }
   }
 
-  private def prepareFodder(corpus: String) = {
-    val sentenceModelInput = new FileInputStream(Play.getFile("data/en-sent.bin"))
-    val sentenceModel = new SentenceModel(sentenceModelInput)
-    val sentenceDetector = new SentenceDetectorME(sentenceModel)
-    sentenceModelInput.close()
+  // not used right now
+  //private def prepareFodder(corpus: String) = {
+    //val sentenceModelInput = new FileInputStream(Play.getFile("data/en-sent.bin"))
+    //val sentenceModel = new SentenceModel(sentenceModelInput)
+    //val sentenceDetector = new SentenceDetectorME(sentenceModel)
+    //sentenceModelInput.close()
 
-    sentenceDetector.sentDetect(corpus)
-  }
+    //sentenceDetector.sentDetect(corpus)
+  //}
 
   def generateSpeech = {
-      fodder(Random.nextInt(fodder.length))
+    chatFodder(Random.nextInt(chatFodder.length))
+  }
+
+  def generateMention(username: String) = {
+    mentionFodder(Random.nextInt(mentionFodder.length)).replace("{mention}", username)
   }
 }
 
@@ -77,7 +80,11 @@ class Bot(username: String, mob: ActorRef) extends Actor {
       case JsString("talk") => {
         val message = (event \ "message").as[String]
         val user = (event \ "user").as[String]
-        self ! RespondTo(user, message)
+
+        // Respond (maybe) if the user was mentioned.
+        if ((message contains username) && (Random.nextFloat < Bot.RESPONSE_PROBABILITY)) {
+          self ! RespondTo(user)
+        }
       }
       case _ => // do nothing
     }
@@ -110,12 +117,9 @@ class Bot(username: String, mob: ActorRef) extends Actor {
 
   def receive = {
     // Respond to a specific user.
-    case RespondTo(fromUser, message) => {
-
-      // First check if the user was mentioned.
-      if ((message contains " " + username + " ") && (Random.nextFloat < Bot.RESPONSE_PROBABILITY)) {
-        mob ! Talk(username, fromUser + ": im talkin to you")
-      }
+    case RespondTo(fromUser) => {
+      val speech = Bot.generateMention(fromUser)
+      mob ! Talk(username, speech)
     }
   }
 
@@ -127,8 +131,10 @@ class Bot(username: String, mob: ActorRef) extends Actor {
   def beginTalkPattern: Unit = {
     context.system.scheduler.scheduleOnce(personality.nextTalk) {
       try {
-        val speech = Bot.generateSpeech
-        mob ! Talk(username, speech)
+        Random.nextFloat match {
+          case r if r < 0.05 => mob ! RandomUser(username)
+          case _ => mob ! Talk(username, Bot.generateSpeech)
+        }
         beginTalkPattern
       } catch {
         case e: NullPointerException => // happens when this is executed after the bot is terminated 
@@ -173,4 +179,4 @@ class Lurker extends Personality {
   def nextTalk: FiniteDuration = Duration.Zero
 }
 
-case class RespondTo(username: String, message: String)
+case class RespondTo(username: String)
