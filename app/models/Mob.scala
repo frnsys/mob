@@ -130,6 +130,7 @@ class Mob extends Actor {
       self ! Quit(username)
     }
 
+    // Gets a random user in this mob and gets the sender to respond to that user.
     case RandomUser(username) => {
       val members_ = members - username
       val username_ = members_.keys.toSeq(Random.nextInt(members_.size))
@@ -185,6 +186,23 @@ class Mob extends Actor {
   def onlyBots = {
     members.size - bots.size == 0
   }
+
+  // Randomly add more bots
+  def beginJoinPattern: Unit = {
+    val countdown = (Random.nextFloat * 60).seconds
+    context.system.scheduler.scheduleOnce(countdown) {
+      try {
+        Random.nextFloat match {
+          case r if r < 0.8 => Bot(self)
+          case _ => // do nothing
+        }
+        beginJoinPattern
+      } catch {
+        case e: NullPointerException => // happens when this is executed after the mob is terminated 
+      }
+    }
+  }
+  beginJoinPattern
 
 }
 

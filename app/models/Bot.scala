@@ -20,7 +20,7 @@ import opennlp.tools.tokenize._
 import opennlp.tools.sentdetect._
 
 object Bot {
-  final val RESPONSE_PROBABILITY = 0.05
+  final val RESPONSE_PROBABILITY = 0.5
   final val SPAWN_PROBABILITY = 0.99
   final val LURKER_PROBABILITY = 0.95
   final val CHATTY_PROBABILITY = 0.001
@@ -118,8 +118,11 @@ class Bot(username: String, mob: ActorRef) extends Actor {
   def receive = {
     // Respond to a specific user.
     case RespondTo(fromUser) => {
-      val speech = Bot.generateMention(fromUser)
-      mob ! Talk(username, speech)
+      // Delay the response a bit.
+      context.system.scheduler.scheduleOnce((2 + Random.nextFloat * 15).seconds) {
+        val speech = Bot.generateMention(fromUser)
+        mob ! Talk(username, speech)
+      }
     }
   }
 
@@ -160,8 +163,7 @@ object Personality {
 abstract class Personality {
   // Lifetime of the bot in seconds.
   // i.e. how long before it leaves.
-  // Default: 30-60min
-  val lifetime: FiniteDuration = (30 + Random.nextFloat * 30).minutes
+  val lifetime: FiniteDuration
 
   // When the bot next speaks.
   def nextTalk: FiniteDuration
@@ -169,14 +171,23 @@ abstract class Personality {
 class Chatty extends Personality {
   // 0.5-11sec
   def nextTalk: FiniteDuration = (0.5 + Random.nextFloat * 10).seconds
+
+  // 5-80min
+  val lifetime: FiniteDuration = (5 + Random.nextFloat * 75).minutes
 }
 class Regular extends Personality {
   // 5-25min
   def nextTalk: FiniteDuration = (5 + Random.nextFloat * 20).minutes
+
+  // 5-65min
+  val lifetime: FiniteDuration = (5 + Random.nextFloat * 60).minutes
 }
 class Lurker extends Personality {
   // Lurkers never speak.
   def nextTalk: FiniteDuration = Duration.Zero
+
+  // 1-61min
+  val lifetime: FiniteDuration = (1 + Random.nextFloat * 60).minutes
 }
 
 case class RespondTo(username: String)
